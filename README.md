@@ -1,6 +1,6 @@
 # Sync-in-avec-FreeIPA
 
-## Intégration d'un serveur Sync-in dans un environnement FreeIPA
+## Intégration d'un serveur Sync-in dans un environnement FreeIPA
 
 **Cette documentation fournit une méthodologie pour mettre en place une plateforme collaborative Sync-in conteneurisée dans une infrastructure d'authentification centralisée avec FreeIPA**
 
@@ -20,6 +20,6 @@
 - Création d'une image personnalisée pour l'intégration du certificat auto-signé du serveur FreeIPA nécessaire aux connexions LDAPS
 - Mise en place d'une synchronisation d'un dossier local avec le client Linux Sync-in
 
-### 🤝 Retours et améliorations appréciés
+### 🤝 Retours et améliorations appréciés
 
 **La documentation est [ici](./rhel-sync-in-freeipa.md)**
