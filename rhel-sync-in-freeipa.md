@@ -483,7 +483,7 @@ openssl x509 -in certs/freeipa-ca.crt -outform PEM -out certs/freeipa-ca.pem
 
 ```bash
 mkdir ldapts && cd ldapts
-wget ./auth-provider-ldap.service.js
+wget https://raw.githubusercontent.com/sysfredintech/Sync-in-avec-FreeIPA/refs/heads/main/js/auth-provider-ldap.service.js
 ```
 
 _Il est possible d'adapter la ligne 108 de ce fichier en fonction du chemin vers le certificat_
