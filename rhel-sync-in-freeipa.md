@@ -327,7 +327,7 @@ L'utilisateur est bien connecté au poste client avec son compte LDAP et son dos
 
 ---
 
-## Installation de Sync-in dans un container podman rootless sur le deuxième serveur RHEL 10
+## Installation de Sync-in dans un container podman rootless sur le deuxième serveur RHEL 10
 
 ### Joindre le domaine
 
