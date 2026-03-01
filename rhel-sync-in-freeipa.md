@@ -182,19 +182,19 @@ ldapmodify -Y GSSAPI -H ldaps://srv-lab-ipa.home.lab:636 -f create-syncin-accoun
 
 Accepter le certificat auto-signé
 
-![web-self-signed](./web-self-signed.png)
+![web-self-signed](./images/web-self-signed.png)
 
 Entrer les identifiants du compte administrateur défini précédemment
 
-![web-login](./web-login.png)
+![web-login](./images/web-login.png)
 
 Créer un utilisateur test pour réaliser la connexion depuis un poste client
 
-![web-user](./web-test-user.png)
+![web-user](./images/web-test-user.png)
 
 Lui attribuer un login et un mot de passe qui devra être modifié à la première connexion
 
-![web-user-2](./web-test-user-2.png)
+![web-user-2](./images/web-test-user-2.png)
 
 
 ---
@@ -205,7 +205,7 @@ Lui attribuer un login et un mot de passe qui devra être modifié à la premiè
 
 - Définir les paramètres réseaux via l'interface graphique
 
-![client-net-conf](./client-net-conf.png)
+![client-net-conf](./images/client-net-conf.png)
 
 - Préparer le système avant la jointure au domaine
 
@@ -228,11 +228,11 @@ apt install freeipa-client -y
 
 Indiquer les informations relatives au domaine et au serveur IPA
 
-![client-net-conf-2](./client-net-conf-2.png)
+![client-net-conf-2](./images/client-net-conf-2.png)
 
-![client-net-conf-3](./client-net-conf-3.png)
+![client-net-conf-3](./images/client-net-conf-3.png)
 
-![client-net-conf-4](./client-net-conf-4.png)
+![client-net-conf-4](./images/client-net-conf-4.png)
 
 - Joindre la machine au domaine
 
@@ -297,7 +297,7 @@ The ipa-client-install command was successful
 
 - Il est possible de vérifier côté serveur que la machine a bien été enrollée
 
-![enroll-ok](./enroll-ok.png)
+![enroll-ok](./images/enroll-ok.png)
 
 - Afin que le gestionnaire de sessions laisse la possibilité d'entrer un login inconnu localement, il faut modifier la configuration de lightdm
 
@@ -315,15 +315,15 @@ allow-guest = false
 
 Saisir les identifiants de l'utilisateur créé précédemment sur le serveur IPA
 
-![connect-client-1](./connect-client-1.png)
+![connect-client-1](./images/connect-client-1.png)
 
 L'utilisateur est invité à changer son mot de passe lors de la première connexion
 
-![connect-client-2](./connect-client-2.png)
+![connect-client-2](./images/connect-client-2.png)
 
 L'utilisateur est bien connecté au poste client avec son compte LDAP et son dossier personnel a bien été créé
 
-![connect-client-3](./connect-client-3.png)
+![connect-client-3](./images/connect-client-3.png)
 
 ---
 
@@ -419,7 +419,7 @@ Valid starting       Expires              Service principal
 
 - Il est possible de vérifier que le serveur a bien été enrollé sur la WebUI de FreeIPA
 
-![sync-in-enroll](./syncin-enroll.png)
+![sync-in-enroll](./images/syncin-enroll.png)
 
 ### Installation du serveur Sync-in containerisé
 
@@ -709,69 +709,69 @@ _L'utilisateur de test ayant déjà effectué une première connexion sur le pos
 
 - Afin de tester correctement cette configuration, il est préférable de créer un second utilisateur sur le serveur IPA puis de se connecter au poste client avec ce nouvel utilisateur
 
-![app-sync-in-1](./app-syncin-1.png)
+![app-sync-in-1](./images/app-syncin-1.png)
 
 Accéder au site depuis le navigateur `http://srv-lab-syncin.home.lab:8080`
 
-![syncin-web-1](./syncin-web-1.png)
+![syncin-web-1](./images/syncin-web-1.png)
 
 Se connecter avec l'utilisateur `user` et le mot de passe `password` afin d'accéder à l'interface d'administration et de créer un compte administrateur sécurisé
 
-![syncin-web-1bis](./syncin-web-1-bis.png)
+![syncin-web-1bis](./images/syncin-web-1-bis.png)
 
-![syncin-web-2](./syncin-web-2.png)
+![syncin-web-2](./images/syncin-web-2.png)
 
 Puis se connecter avec ce compte administrateur afin d'activer l'authentification à 2 facteurs et de supprimer le compte temporaire `user`
 
-![syncin-web-2bis](./syncin-web-2bis.png)
+![syncin-web-2bis](./images/syncin-web-2bis.png)
 
-![syncin-web-2ter](./syncin-web-2ter.png)
+![syncin-web-2ter](./images/syncin-web-2ter.png)
 
 Se déconnecter puis tester une connexion via l'application client
 
-![con-app-1](./con-appli-1.png)
+![con-app-1](./images/con-appli-1.png)
 
 Ajouter notre serveur Sync-in
 
-![con-app-2](./con-appli-2.png)
+![con-app-2](./images/con-appli-2.png)
 
 Renseigner l'adresse du serveur et son port d'écoute
 
-![con-app-3](./con-appli-3.png)
+![con-app-3](./images/con-appli-3.png)
 
 Entrer les identifiants d'un compte utilisateur de l'annuaire LDAP FreeIPA
 
-![con-app-4](./con-appli-4.png)
+![con-app-4](./images/con-appli-4.png)
 
 La connexion s'est effectuée comme attendu et l'utilisateur de la base LDAP a été créé sur le serveur Sync-in
 
-![con-app-5](./con-appli-5.png)
+![con-app-5](./images/con-appli-5.png)
 
 - Mise en place de la synchronisation du dossier utilisateur `Documents` entre le poste et le serveur Sync-in
 
 Créer un dossier `Documents` dans l'espace personnel de l'utilisateur
 
-![syncro-1](./syncro-1.png)
+![syncro-1](./images/syncro-1.png)
 
 Mettre en place une synchronisation des deux dossiers à intervalles réguliers
 
-![syncro-2](./syncro-2.png)
+![syncro-2](./images/syncro-2.png)
 
 Définir le dossier local
 
-![syncro-3](./syncro-3.png)
+![syncro-3](./images/syncro-3.png)
 
 Définir le dossier distant dans `personal files`
 
-![syncro-4](./syncro-4.png)
+![syncro-4](./images/syncro-4.png)
 
 Choisir les options de synchronisation et d'intervalles souhaités
 
-![syncro-5](./syncro-5.png)
+![syncro-5](./images/syncro-5.png)
 
 Puis tester le bon déroulement de la synchronisation en créant des fichiers sur les deux emplacements
 
-![syncro-6](./syncro-6.png)
+![syncro-6](./images/syncro-6.png)
 
 L'intervalle d'une minute a permis de constater l'opération réalisée très rapidement
 
