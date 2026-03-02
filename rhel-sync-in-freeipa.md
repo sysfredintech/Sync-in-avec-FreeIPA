@@ -49,7 +49,7 @@ _Ces valeurs sont à adapter en fonction de l'architecture en place et du nom de
 ### Installation du service IPA-server
 
 ```bash
-dnf install ipa-server -y
+dnf install ipa-server freeipa-server-dns -y
 ipa-server-install --hostname=srv-lab-ipa.home.lab -n home.lab -r HOME.LAB --auto-forwarder --setup-dns --allow-zone-overlap --reverse-zone=10.168.192.in-addr.arpa.
 ```
 Le message suivant est normal car le DNS principal ne connaît pas le domaine home.lab
