@@ -111,7 +111,7 @@ The ipa-server-install command was successful
 
 ```bash
 firewall-cmd --add-service=http --add-service=https --add-service=ldap --add-service=ldaps --add-service=kerberos --add-service=ntp --permanent
-firewall-cmd --add-port=53/tcp --add-port=53/udp --add-port=88/tcp --add-port=464/udp --permanent
+firewall-cmd --add-port=53/tcp --add-port=53/udp --add-port=88/tcp --add-port=464/udp --add-port=464/tcp --permanent
 firewall-cmd --reload
 ```
 
