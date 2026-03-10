@@ -115,6 +115,18 @@ firewall-cmd --add-port=53/tcp --add-port=53/udp --add-port=88/tcp --add-port=46
 firewall-cmd --reload
 ```
 
+### Modification du fichier ldap.conf
+
+A l'installation de FreeIPA, l'URI n'est pas configurer correctement
+
+```bash
+vim /etc/openldap/ldap.conf
+```
+Modifier la ligne suivante en indiquant le FQDN du serveur
+```
+URI     ldap://srv-lab-ipa.home.lab
+```
+
 ### Obtention d'un ticket Kerberos
 
 ```bash
