@@ -10,14 +10,14 @@
 - Serveur Sync-in en container Podman rootless
 - Authentification LDAPS des utilisateurs Sync-in via l'annuaire FreeIPA
 - Synchronisation des données utilisateurs sur un poste client Linux Mint ↔ serveur Sync-in
-- Sécurisation des données sensibles et des connexions
 
 ### 📚 Contenu
 
 - Installation et configuration minimale du serveur FreeIPA
 - Jointure du client Linux Mint au domaine
+- Jointure du serveur RHEL dédié au container Sync-in au domaine
 - Containerisation de Sync-in avec Podman (rootless)
-- Création d'une image personnalisée pour l'intégration du certificat auto-signé du serveur FreeIPA nécessaire aux connexions LDAPS
+- Mise en place d'une connexion LDAPS entre le serveur Sync-in et FreeIPA pour les authentifications
 - Mise en place d'une synchronisation d'un dossier local avec le client Linux Sync-in
 
 ### 🤝 Retours et améliorations appréciés

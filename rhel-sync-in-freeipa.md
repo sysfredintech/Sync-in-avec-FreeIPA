@@ -478,8 +478,6 @@ su - syncin
 cd sync-in-docker
 ```
 
-**A partir de ce point, si l'on souhaite pouvoir effectuer des connexions sécurisées via le protocole `ldaps` avec le serveur FreeIPA, il va falloir créer une image personnalisée de Sync-in afin qu'il fasse confiance au certificat auto-signé du serveur. Il semble qu'il n'existe aucune manière de définir le certificat auto-signé comme sûr via les variables d'environnement du container, ceci fera peut-être l'objet d'une évolution du projet à l'avenir mais à ce jour il faut procéder comme suit**
-
 - Récupérer le certificat du serveur FreeIPA contenu dans le fichier `/etc/ipa/ca.crt` du serveur FreeIPA et de le copier dans un fichier localement. Soit avec la commande `scp` et un utilisateur local ou via un copier/coller du contenu du fichier
 
 ```bash
@@ -491,37 +489,9 @@ Il faut ensuite convertir ce fichier au format `pem`
 openssl x509 -in certs/freeipa-ca.crt -outform PEM -out certs/freeipa-ca.pem
 ```
 
-- Créer un dossier `ldapts` et y placer le fichier `auth-provider-ldap.service.js` personnalisé qui remplacera celui du container afin d'y ajouter le chemin vers le certificat. Ce fichier provient de l'image officielle Sync-in, les modifications interviennent entre les lignes 94 et 111
+- Editer les fichiers `docker-compose.yaml` et `environment.yaml` afin de personnaliser la configuration. Dans un environnement SELinux, il faut impérativement placer l'option `Z` pour les volumes
 
-```bash
-mkdir ldapts && cd ldapts
-wget https://raw.githubusercontent.com/sysfredintech/Sync-in-avec-FreeIPA/refs/heads/main/js/auth-provider-ldap.service.js
-```
-
-_Il est possible d'adapter la ligne 108 de ce fichier en fonction du chemin vers le certificat_
-
-- Création du `Dockerfile` et build de l'image personnalisée
-
-```bash
-vim Dockerfile
-```
-```
-FROM syncin/server:2
-
-RUN mkdir -p /app/certs
-
-COPY certs/freeipa-ca.pem /app/certs/freeipa-ca.pem
-
-COPY ldapts/auth-provider-ldap.service.js /app/server/authentication/providers/ldap/auth-provider-ldap.service.js
-```
-```bash
-podman build -t sync-in-freeipa .
-```
-Choisir le dépôt `docker.io`
-
-- Editer les fichiers `docker-compose.yaml` et `environment.yaml` afin de définir l'image personnalisée créée précédemment et l'utilisation de variables pour les informations sensibles. Dans un environnement SELinux, il faut impérativement placer l'option `Z` pour les volumes
-
-_Cette configuration doit être adaptée selon les éléments de l'infrastructure en place_
+**Cette configuration doit être adaptée selon les éléments de l'infrastructure en place et les secrets et mots de passe doivent être changés par des chaînes de caractères complexes**
 
 ```bash
 vim docker-compose.yaml
@@ -531,30 +501,30 @@ vim docker-compose.yaml
 #  - ./config/nginx/docker-compose.nginx.yaml
 #  - ./config/onlyoffice/docker-compose.onlyoffice.yaml
 #  - ./config/collabora/docker-compose.collabora.yaml
-#  - ./config/sync-in-desktop-releases/docker-compose.sync-in-desktop-releases.yaml
+#  - ./config/sync-in-desktop-releases/docker-compose.name: sync-in
 
-name: sync-in
 services:
   sync_in:
-    image: localhost/sync-in-freeipa
-    env_file:
-      - .env
+    image: syncin/server:latest
     container_name: sync-in
     restart: always
     environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - SYNCIN_MYSQL_URL=${SYNCIN_MYSQL_URL}
+      - INIT_LDAP_SERVICE_BIND_PASSWORD=${SERVICE_BIND_PASSWORD}
       - INIT_ADMIN
       - INIT_ADMIN_PASSWORD
       - INIT_ADMIN_LOGIN
       - PUID=${PUID:-8888}
       - PGID=${PGID:-8888}
-      - SYNCIN_MYSQL_URL
-      - SYNCIN_AUTH_LDAP_SERVICEBINDPASSWORD
     ports:
       - "8080:8080"
     volumes:
       - ./environment.yaml:/app/environment/environment.yaml:Z
       - data:/app/data:Z
       - desktop_releases:/app/static/releases:ro
+      - ./certs/freeipa-ca.pem:/app/certs/freeipa-ca.pem.pem:ro
     depends_on:
       - mariadb
     logging:
@@ -567,8 +537,6 @@ services:
 
   mariadb:
     image: mariadb:11
-    env_file:
-      - .env
     container_name: mariadb
     restart: always
     command: --innodb_ft_cache_size=16000000 --max-allowed-packet=1G
@@ -582,13 +550,13 @@ services:
 
 networks:
   sync_in_network:
+    name: sync_in_network
     driver: bridge
 
 volumes:
   data:
   mariadb_data:
   desktop_releases:
-
 ```
 
 - La configuration suivante met en place l'authentification via l'annuaire du serveur FreeIPA ainsi que les options nécessaires à l'automatisation de la création des éléments des comptes utilisateurs
@@ -599,55 +567,75 @@ L'intégralité des options utilisables sont listées sur [le site officiel de S
 vim environment.yaml
 ```
 ```
+mysql:
+  url: 'mysql://root:strongpass@mariadb:3306/sync_in'
 auth:
+  # Warning: do not change or remove the encryption key after MFA activation, or the codes will become invalid
+  encryptionKey: 'e0d3c2e6f9ef4aa40cefe09f0f71b4fa175fc216e7662d262abd44fd3386f940'
+  # cookie sameSite setting: `lax` | `strict`
+  # default: `strict`
+  cookieSameSite: strict
+  token:
+    access:
+      secret: 'fb53b031972dcc4bad77323926bc5419ddbf0f9c5c905dc7a74f201a8995e268'
+      expiration: 30m
+    refresh:
+      secret: '8a953e4f5224cc7ec5c6c6c99d80ec05aa90045577f11680bfd45ebe95882f92'
+      expiration: 4h
   provider: ldap
   ldap:
-    servers: [ldaps://srv-lab-ipa.home.lab:636]
+    servers:
+      - ldaps://srv-lab-ipa.home.lab:636
+    tlsOptions:
+      ca:
+        - /app/certs/freeipa-ca.pem
+      rejectUnauthorized: true
     baseDN: cn=users,cn=accounts,dc=home,dc=lab
+    filter: (objectClass=person)
     serviceBindDN: uid=sync-in,cn=sysaccounts,cn=etc,dc=home,dc=lab
     attributes:
       login: uid
       email: mail
-    options:
-      autoCreatePermissions:
-        - personal_space
-        - spaces_access
-        - shares_access
-        - personal_groups_admin
-        - desktop_app_access
-        - desktop_app_sync
-        - webdav_access
+  options:
+    autoCreateUser: true
+    autoCreatePermissions:
+      - personal_space
+      - spaces_access
+      - shares_access
+      - personal_groups_admin
+      - desktop_app_access
+      - desktop_app_sync
+      - webdav_access
 applications:
   files:
     dataPath: /app/data
-    collabora:
-      enabled: false
-    onlyoffice:
-      enabled: false
-      secret: onlyOfficeSecret
+    editors:
+      collabora:
+        enabled: false
+      onlyoffice:
+        enabled: false
+        secret: 'onlyOfficeSecret'
+      eurooffice:
+        enabled: false
+        secret: 'euroOfficeSecret'
 ```
 
 - Afin de sécuriser la configuration, stocker les secrets dans un unique fichier `.env`
-
-_Les mots de passe suivants doivent être modifiés par des chaînes de caractères complexes_
 
 ```bash
 vim .env
 ```
 ```
-SYNCIN_MYSQL_URL="mysql://root:Password9999@mariadb:3306/sync_in"
-SYNCIN_AUTH_ENCRYPTIONKEY="changeEncryptionKeyWithStrongKey"
-SYNCIN_AUTH_TOKEN_ACCESS_SECRET="changeAccessWithStrongSecret"
-SYNCIN_AUTH_TOKEN_REFRESH_SECRET="changeAccessWithStrongSecret"
-MYSQL_ROOT_PASSWORD="Password9999"
-MYSQL_DATABASE="sync_in"
-SYNCIN_AUTH_LDAP_SERVICEBINDPASSWORD="Password9999"
+SYNCIN_MYSQL_URL=mysql://root:strongpass@mariadb:3306/sync_in
+MYSQL_ROOT_PASSWORD=strongpass
+MYSQL_DATABASE=sync_in
+SERVICE_BIND_PASSWORD=Password9999
 ```
 ```bash
 chmod 600 .env
 ```
 
-- Lancer le container avec l'initialisation du compte admin, les identifiants devront être changés
+- Lancer le container avec l'initialisation du compte admin, les identifiants devront être changés par la suite
 
 ```bash
 INIT_ADMIN=true INIT_ADMIN_LOGIN='user' INIT_ADMIN_PASSWORD='password' podman compose up -d
